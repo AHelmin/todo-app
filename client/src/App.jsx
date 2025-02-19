@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css'
-const API_URL = 'http://localhost:3001/api/todos';
+const API_URL = 'http://localhost:3001/api';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -113,6 +113,14 @@ function App() {
         <>
           <p>Welcome, {username}!</p>
           <button onClick={logout}>Logout</button>
+
+          <input
+          type='text'
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          placeholder='Add a new todo'
+          />
+          <button onClick={addTodo}>Add</button>
 
           <ul>
             {todos.map((todo) => {
