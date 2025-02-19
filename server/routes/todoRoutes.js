@@ -1,12 +1,13 @@
 const express = require('express');
 const Todo = require('../models/Todo');
+const authMiddleWare = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // ✅ Get all todos
-router.get("/", async (req, res) => {
+router.get("/", authMiddleWare, async (req, res) => {
     try {
-        const todos = await Todo.find(); // Fetch all todos from MongoDB
+        const todos = await Todo.find({ user: req.user }); // Fetch todos by logged in user from MongoDB
         res.json(todos);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -14,9 +15,13 @@ router.get("/", async (req, res) => {
 });
 
 // ✅ Create a new todo
-router.post("/", async (req, res) => {
+router.post("/", authMiddleWare, async (req, res) => {
     try {
-        const newTodo = new Todo({ text: req.body.text }); // Create a new todo object
+        const newTodo = new Todo({ 
+            text: req.body.text,
+            completed: false,
+            user: req.user, //assign todo to logged in user 
+        }); // Create a new todo object
         await newTodo.save(); // Save to database
         res.status(201).json(newTodo); // Return the created todo
     } catch (err) {
@@ -25,10 +30,10 @@ router.post("/", async (req, res) => {
 });
 
 // ✅ Toggle todo completion
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleWare, async (req, res) => {
     try {
-        const todo = await Todo.findById(req.params.id);
-        if (!todo) return res.status(404).json({ message: "Todo not found" });
+        const todo = await Todo.findById({ _id: req.params.id, user: req.user });
+        if (!todo) return res.status(404).json({ message: "Todo not found or unauthorized" });
 
         todo.completed = !todo.completed; // Toggle completion
         await todo.save();
@@ -39,9 +44,9 @@ router.put("/:id", async (req, res) => {
 });
 
 // ✅ Delete a todo
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authMiddleWare, async (req, res) => {
     try {
-        const deletedTodo = await Todo.findByIdAndDelete(req.params.id);
+        const deletedTodo = await Todo.findByIdAndDelete({ _id: req.params.id, user: req.user });
         if (!deletedTodo) return res.status(404).json({ message: "Todo not found" });
 
         res.json({ message: "Todo deleted" });

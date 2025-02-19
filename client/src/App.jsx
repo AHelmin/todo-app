@@ -9,18 +9,6 @@ function App() {
   const [username, setUsername] = useState('');
   const [authForm, setAuthform] = useState({ username: '', password: '' }); //store login/register input
 
-  //Fetch todos when logged in
-  useEffect(() => {
-    if (token) {
-      fetch(`${API_URL}/todos`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => setTodos(data))
-        .catch((err) => console.error('Error fetching todos: ', err));
-    }
-  }, [token]);
-
   //Handle login and registration
   const handleAuth = (type) => {
     fetch(`${API_URL}/auth/${type}`, {
@@ -40,6 +28,24 @@ function App() {
       })
       .catch((err) => console.error('Auth error: ', err));
   };
+
+    //Fetch todos when logged in
+    useEffect(() => {
+      if (token) {
+        fetch(`${API_URL}/todos`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((res) => res.json())
+          .then((data) => setTodos(data))
+          .catch((err) => console.error('Error fetching todos: ', err));
+      }
+    }, [token]);
+   
+   useEffect(() => {
+    console.log('Updated todos: ', todos)
+   })
+
 
   //Logout function
   const logout = () => {
