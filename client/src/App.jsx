@@ -29,23 +29,31 @@ function App() {
       .catch((err) => console.error('Auth error: ', err));
   };
 
-    //Fetch todos when logged in
-    useEffect(() => {
-      if (token) {
-        fetch(`${API_URL}/todos`, {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${token}` },
+  //Fetch todos when logged in
+  useEffect(() => {
+    if (token) {
+      console.log('Fetching todos...')
+      fetch(`${API_URL}/todos`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('Fetched todos:', data)
+          setTodos([...data])
         })
-          .then((res) => res.json())
-          .then((data) => setTodos(data))
-          .catch((err) => console.error('Error fetching todos: ', err));
-      }
-    }, [token]);
-   
-   useEffect(() => {
-    console.log('Updated todos: ', todos)
-   })
 
+        .catch((err) => console.error('Error fetching todos: ', err));
+    }
+  }, [token]);
+
+  //  useEffect(() => {
+  //   console.log('Updated todos: ', todos)
+  //  })
+
+  useEffect(() => {
+    console.log("Updated Todos State:", todos);
+  }, [todos]); // ✅ This logs todos whenever state updates
 
   //Logout function
   const logout = () => {
@@ -121,25 +129,27 @@ function App() {
           <button onClick={logout}>Logout</button>
 
           <input
-          type='text'
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          placeholder='Add a new todo'
+            type='text'
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+            placeholder='Add a new todo'
           />
           <button onClick={addTodo}>Add</button>
 
           <ul>
-            {todos.map((todo) => {
-              <li key={todo._id}>
+            {todos.length === 0 && <p>No todos available (Debug: {JSON.stringify(todos)})</p>}
+
+            {todos.map((todo, index) => (
+              <li key={todo._id || index}> {/* Use index as fallback for missing _id */}
                 <span
-                  className={todo.completed ? 'completed' : ''}
+                  className={todo.completed ? "completed" : ""}
                   onClick={() => toggleTodo(todo._id)}
                 >
-                  {todo.text}
+                  {todo.text || "(No text)"} {/* Show "(No text)" if text is missing */}
                 </span>
-                <button className='delete-btn' onClick={() => deleteTodo(todo._id)}>❌</button>
+                <button className="delete-btn" onClick={() => deleteTodo(todo._id)}>❌</button>
               </li>
-            })}
+            ))}
           </ul>
         </>
       )}

@@ -7,7 +7,9 @@ const router = express.Router();
 // ✅ Get all todos
 router.get("/", authMiddleWare, async (req, res) => {
     try {
+        console.log("Authenticated User ID:", req.user); // ✅ Check logged-in user
         const todos = await Todo.find({ user: req.user }); // Fetch todos by logged in user from MongoDB
+        console.log("Todos from Database:", todos); // ✅ See if todos exist
         res.json(todos);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -17,6 +19,8 @@ router.get("/", authMiddleWare, async (req, res) => {
 // ✅ Create a new todo
 router.post("/", authMiddleWare, async (req, res) => {
     try {
+        console.log("Logged-in User ID:", req.user); // ✅ Confirming user ID
+        
         const newTodo = new Todo({ 
             text: req.body.text,
             completed: false,
