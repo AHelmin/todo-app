@@ -137,7 +137,7 @@ function App() {
           <button onClick={addTodo}>Add</button>
 
           <ul>
-            {todos.length === 0 && <p>No todos available (Debug: {JSON.stringify(todos)})</p>}
+            {todos.length === 0 && <p>No Todos Available</p>}
 
             {todos.map((todo, index) => (
               <li key={todo._id || index}> {/* Use index as fallback for missing _id */}
